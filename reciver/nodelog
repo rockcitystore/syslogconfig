@@ -1,0 +1,14 @@
+#全局配置
+
+#指定文件配置
+/opt/log/yingyan.servers.log {
+	rotate 60
+	daily
+	notifempty
+	missingok
+	size 50M
+	dateext
+        postrotate
+	/bin/kill -HUP `cat /var/run/syslogd.pid 2> /dev/null` 2> /dev/null || true
+        endscript
+}
