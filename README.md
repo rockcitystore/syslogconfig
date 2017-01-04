@@ -14,32 +14,6 @@
 [https://github.com/phuesler/ain](https://github.com/phuesler/ain)
 发送日志服务器的rsyslog.conf之所以要开启udp支持主要因为发送服务器的syslog需要udp到本地才能接受到日志并转发到接受日志服务器
 
-如果直接使用如下配置，
-```
-//utils/logger.js
-, {
-            type: 'log4js-ain2',
-            tag: 'yingyan.servers',
-            facility: 'user',
-            hostname:'10.37.86.93'//接收服务器ip
-        }
-```
-接受日志服务器的日志不能区分日志来源,全部显示为接收服务器ip， **但是可以通过把ip加入tag变通解决**
-
-```
-Jan  1 18:49:24 10.37.86.93 yingyan.servers[5118]: app.js - yingyan_v2_server listen at 130 in PRE
-Jan  1 18:49:24 10.37.86.93 yingyan.servers[5118]: app.js - load action :./actions/specAnalysis.js
-```
-
-
-
-
-或者按照以下配置：
-
-
-
-
-
 ##node配置
 ```
 //utils/logger.js
@@ -49,12 +23,17 @@ log4js.configure({
     appenders: [
         {
             type: 'console'
+            , layout: {
+            type: "pattern",
+            pattern: "%d %[%-5p%] %c %m"
+        }
         }
         , {
             type: 'log4js-ain2',
             tag: 'yingyan.servers',
             facility: 'user'
-           ,hostname:require('os').networkInterfaces().eth0[0].address
+            //兼容liunx和macos
+           ,hostname: (require('os').networkInterfaces().eth0 && require('os').networkInterfaces().eth0[0].address) || (require('os').networkInterfaces().en0 && require('os').networkInterfaces().en0[1].address) || 'none IP address'
         }
     ],
     levels: {
@@ -115,12 +94,9 @@ $UDPServerRun 514
 *.info;mail.none;authpriv.none;cron.none;user.none                /var/log/messages
 
 //新增
-#yingyan  user在log4js的facility配置 记录到info级
+#yingyan  user是／utils/logger里的facility配置 记录到info级
 user.info              @10.37.86.93
-# remote host is: name/ip:port, e.g. 192.168.0.1:514, port optional
-#*.* @@remote-host:514
-//新增
- *.* @@127.0.0.1:514
+
 ```
 
 ####重启服务
