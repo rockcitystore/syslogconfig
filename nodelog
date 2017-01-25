@@ -1,4 +1,4 @@
-/opt/log/yingyan.servers.log {
+/opt/logs/yingyan.servers.log {
         rotate 1440
         hourly
         notifempty
