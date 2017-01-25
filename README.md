@@ -134,3 +134,6 @@ sed -e 's/\(.*info,.*\)/\o033[32m\1\o033[39m/' \
 
 ```
 
+
+
+>There is `/etc/cron.daily/logrotate` script for daily logrotates. However there is no such script by default in `/etc/cron.hourly/` directory. Copy this script and it should work fine.
