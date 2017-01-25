@@ -1,9 +1,9 @@
 /opt/logs/yingyan.servers.log {
         rotate 1440
-        hourly
         notifempty
         missingok
         dateext
+	dateformat .%Y%m%d-%s
         postrotate
         /bin/kill -HUP `cat /var/run/syslogd.pid 2> /dev/null` 2> /dev/null || true
         endscript

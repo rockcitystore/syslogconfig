@@ -122,11 +122,10 @@ sed -e 's/\(.*info,.*\)/\o033[32m\1\o033[39m/' \
 #指定文件配置
 /opt/logs/yingyan.servers.log {
 	rotate 1440# 保留两个月 
-	hourly #按小时
 	notifempty#日志文件为空不进行转储
 	missingok#如果日志文件不存在，不报错
-	size 50M#超过50MB后轮转日志
 	dateext #	增加日期作为后缀，不然会是一串无意义的数字
+        dateformat .%Y%m%d-%s
         postrotate
 	/bin/kill -HUP `cat /var/run/syslogd.pid 2> /dev/null` 2> /dev/null || true
         endscript
