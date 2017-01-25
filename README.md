@@ -65,7 +65,7 @@ $UDPServerRun 514
 #模板
 $template verbose,"%timegenerated%,%syslogseverity-text%,%HOSTNAME%,%syslogtag%%msg:::json%\n"
 #yingyan  user在log4js的facility配置 记录到info级
-user.*              /opt/log/yingyan.servers.log;verbose
+user.*              /opt/logs/yingyan.servers.log;verbose
 
 # remote host is: name/ip:port, e.g. 192.168.0.1:514, port optional
 #*.* @@remote-host:514
@@ -107,7 +107,7 @@ user.info              @10.37.86.93
 
 ##颜色输出
 ```
-tail -f /opt/log/yingyan.servers.log |
+tail -f /opt/logs/yingyan.servers.log |
 sed -e 's/\(.*info,.*\)/\o033[32m\1\o033[39m/' \
     -e 's/\(.*err,.*\)/\o033[31m\1\o033[39m/'
 ```
@@ -115,18 +115,18 @@ sed -e 's/\(.*info,.*\)/\o033[32m\1\o033[39m/' \
 ##配置logrotate
 
 教程：[http://xstarcd.github.io/wiki/Linux/rsyslog_logrotate.html](http://xstarcd.github.io/wiki/Linux/rsyslog_logrotate.html)
-往`/etc/logrotate.d/`添加配置文件`nodelog`,实现按日期保存日志
+往`/etc/logrotate.d/`添加配置文件`nodelog`,实现按日期/小时/周/月保存日志
 ```
 #全局配置
 
 #指定文件配置
-/opt/log/yingyan.servers.log {
-	rotate 60
-	daily
-	notifempty
-	missingok
-	size 50M
-	dateext
+/opt/logs/yingyan.servers.log {
+	rotate 1440# 保留两个月 
+	hourly #按小时
+	notifempty#日志文件为空不进行转储
+	missingok#如果日志文件不存在，不报错
+	size 50M#超过50MB后轮转日志
+	dateext #	增加日期作为后缀，不然会是一串无意义的数字
         postrotate
 	/bin/kill -HUP `cat /var/run/syslogd.pid 2> /dev/null` 2> /dev/null || true
         endscript
@@ -135,5 +135,5 @@ sed -e 's/\(.*info,.*\)/\o033[32m\1\o033[39m/' \
 ```
 
 
-
+####开启按小时轮转
 >There is `/etc/cron.daily/logrotate` script for daily logrotates. However there is no such script by default in `/etc/cron.hourly/` directory. Copy this script and it should work fine.
